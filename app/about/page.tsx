@@ -23,7 +23,7 @@ export default function AboutPage() {
             {title.split('').map((letter, index) => (
               <span 
                 key={index} 
-                className="inline-block transition-all duration-100 hover:text-[#eb4279] hover:scale-110 origin-bottom cursor-default"
+                className="inline-block transition-all duration-100 hover:text-[#4e1594] hover:scale-110 origin-bottom cursor-default"
               >
                 {letter === ' ' ? '\u00A0' : letter}
               </span>

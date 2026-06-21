@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
+import { useRouter } from 'next/navigation' // Imported for programmatic redirect
 import Link from 'next/link'
 import NavBar from '@/components/NavBar'
 import Footer from '@/components/Footer'
@@ -8,12 +9,15 @@ import Footer from '@/components/Footer'
 export default function MainPage() {
   const username = "@mrcapy03.";
   const [timeString, setTimeString] = useState("");
+  const router = useRouter();
+  
+  // useRef keeps track of the sequence across renders without causing unnecessary re-renders
+  const hoveredIndices = useRef<number[]>([]);
 
   useEffect(() => {
     const updateTime = () => {
       const now = new Date();
       
-      // Separate formatters lock the timezone to Spain and prevent system locale from breaking the UI layout
       const timeFormatter = new Intl.DateTimeFormat('en-US', {
         timeZone: 'Europe/Madrid',
         hour: 'numeric',
@@ -39,26 +43,43 @@ export default function MainPage() {
     updateTime();
     const timer = setInterval(updateTime, 1000);
 
-    // Clean up the interval on unmount to keep things fast and leak-free
     return () => clearInterval(timer);
   }, []);
 
+  // Handles checking if the user is hovering the correct next character
+  const handleMouseEnter = (index: number) => {
+    const nextExpectedIndex = hoveredIndices.current.length;
+
+    if (index === nextExpectedIndex) {
+      // User hovered the correct next letter in line
+      hoveredIndices.current.push(index);
+
+      // If they successfully hovered all letters back-to-back
+      if (hoveredIndices.current.length === username.length) {
+        router.push('/surprise');
+      }
+    } else if (index === 0) {
+      // If they hover the first letter again, reset progress to just the first letter
+      hoveredIndices.current = [0];
+    } else {
+      // They broke the combo; reset the progress
+      hoveredIndices.current = [];
+    }
+  };
+
   return (
-    // min-h-screen + flex-col stretches the viewport so the footer always stays pinned to the bottom
     <div className="flex min-h-screen flex-col bg-white">
       <NavBar />
 
-      {/* grow expands the main tag vertically to push the footer down */}
       <main className="grow mx-auto max-w-7xl w-full px-4 sm:px-6">
         
         <section className="pt-32 pb-20 md:pt-48">
-          {/* select-none stops users from accidentally text-highlighting the letters while playing with the hover */}
           <h1 className="text-black text-6xl sm:text-7xl font-bold lg:text-9xl tracking-tight select-none">
-            {/* Splits string into an array to attach hover and hardware-accelerated scaling to single characters */}
             {username.split('').map((letter, index) => (
               <span 
                 key={index} 
-                className="inline-block transition-all duration-100 hover:text-[#eb4279] hover:scale-110 origin-bottom cursor-default"
+                onMouseEnter={() => handleMouseEnter(index)} // Trigger logic on hover
+                className="inline-block transition-all duration-100 hover:text-[#4e1594] hover:scale-110 origin-bottom cursor-default"
               >
                 {letter}
               </span>

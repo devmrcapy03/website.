@@ -12,7 +12,7 @@ export default function Footer() {
             href="https://github.com/devmrcapy03/website."
             target="_blank" 
             rel="noopener noreferrer"
-            className="hover:text-black transition-colors duration-200"
+            className="hover:text-[#150d28] transition-colors duration-200"
           >
             source code.
           </Link>
