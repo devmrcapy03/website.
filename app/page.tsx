@@ -1,8 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { useRouter } from 'next/navigation' // Imported for programmatic redirect
-import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import NavBar from '@/components/NavBar'
 import Footer from '@/components/Footer'
 
@@ -11,8 +10,8 @@ export default function MainPage() {
   const [timeString, setTimeString] = useState("");
   const router = useRouter();
   
-  // useRef keeps track of the sequence across renders without causing unnecessary re-renders
-  const hoveredIndices = useRef<number[]>([]);
+  // Tracks the clicked sequence across renders
+  const clickedIndices = useRef<number[]>([]);
 
   useEffect(() => {
     const updateTime = () => {
@@ -46,24 +45,23 @@ export default function MainPage() {
     return () => clearInterval(timer);
   }, []);
 
-  // Handles checking if the user is hovering the correct next character
-  const handleMouseEnter = (index: number) => {
-    const nextExpectedIndex = hoveredIndices.current.length;
+  // Handles checking sequential clicks/taps
+  const handleLetterClick = (e: React.PointerEvent, index: number) => {
+    const nextExpectedIndex = clickedIndices.current.length;
 
     if (index === nextExpectedIndex) {
-      // User hovered the correct next letter in line
-      hoveredIndices.current.push(index);
+      // User clicked/tapped the correct consecutive letter
+      clickedIndices.current.push(index);
 
-      // If they successfully hovered all letters back-to-back
-      if (hoveredIndices.current.length === username.length) {
+      if (clickedIndices.current.length === username.length) {
         router.push('/surprise');
       }
     } else if (index === 0) {
-      // If they hover the first letter again, reset progress to just the first letter
-      hoveredIndices.current = [0];
+      // Reset progress to just the first letter if they start over
+      clickedIndices.current = [0];
     } else {
-      // They broke the combo; reset the progress
-      hoveredIndices.current = [];
+      // Combo broken; reset progress completely
+      clickedIndices.current = [];
     }
   };
 
@@ -74,12 +72,17 @@ export default function MainPage() {
       <main className="grow mx-auto max-w-7xl w-full px-4 sm:px-6">
         
         <section className="pt-32 pb-20 md:pt-48">
+
+          <span className='text-lg text-gray-50'>try clicking/tapping every letter in order</span>
           <h1 className="text-black text-6xl sm:text-7xl font-bold lg:text-9xl tracking-tight select-none">
             {username.split('').map((letter, index) => (
               <span 
                 key={index} 
-                onMouseEnter={() => handleMouseEnter(index)} // Trigger logic on hover
-                className="inline-block transition-all duration-100 hover:text-[#4e1594] hover:scale-110 origin-bottom cursor-default"
+                // onPointerDown handles both mouse clicks and touch taps instantly
+                onPointerDown={(e) => handleLetterClick(e, index)}
+                // 'touch-action: manipulation' prevents double-tap zooming on mobile browsers
+                style={{ touchAction: 'manipulation' }}
+                className="inline-block transition-all duration-100 cursor-pointer text-black hover:text-[#4e1594] hover:scale-110 active:text-[#4e1594] active:scale-95 origin-bottom"
               >
                 {letter}
               </span>
