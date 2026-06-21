@@ -39,7 +39,7 @@ export default function AboutPage() {
                 Hello there wanderer. I'm <span className="text-black font-semibold">@mrcapy03</span>—a student, programmer, and UI/UX designer based in Spain.
               </p>
               <p>
-                I like designing mock interfaces, posters, in Figma. Code things with Python, Next.js and AI. I'm really into computers, video games, F1, and aviation. I'm somewhat of a maths and physics nerd.
+                I like designing mock interfaces, posters in Figma, code things with Python, Next.js and AI. I'm really into computers, video games, F1, and aviation. I'm somewhat of a maths and physics nerd.
               </p>
             </div>
 
